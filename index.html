@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback Gruppen Generator</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+  <div class="container d-flex flex-column justify-content-center align-items-center">
+    <h1 class="text-center mt-5">Feedback Paare</h1>
+    <div id="persons">
+      <!-- Persons will be listed here -->
+    </div>
+    <div id="round1Pairs" class="mt-4">
+      <!-- Round 1 Pairs will be listed here -->
+    </div>
+    <div id="round2Pairs" class="mt-4">
+      <!-- Round 2 Pairs will be listed here -->
+    </div>
+    <div id="round3Pairs" class="mt-4">
+      <!-- Round 3 Pairs will be generated and listed here -->
+    </div>
+    <button id="generatePairs" class="btn btn-primary mt-4">Generiere Paare</button>
+  </div>
+
+  <script>
+    let persons = [
+      "Alisa C.",
+      "Andreas B.",
+      "Andreas H.",
+      "Dieter A.",
+      "Günter B.",
+      "Jörg W.",
+      "Karin M.",
+      "Marc H.",
+      "Michael H.",
+      "Michael d.",
+      "Ralf D.",
+      "Torsten K."
+    ];
+    
+    // Pairs from Round 1
+    let round1Pairs = new Set([
+      new Set(["Alisa C.", "Andreas B."]),
+      new Set(["Karin M.", "Marc H."]),
+      new Set(["Andreas H.", "Jörg W."]),
+      new Set(["Dieter A.", "Michael d."]),
+      new Set(["Ralf D.", "Günter B."]),
+      new Set(["Torsten K.", "Michael H."])
+    ]);
+    
+    // Pairs from Round 2
+    let round2Pairs = new Set([
+      new Set(["Alisa C.", "Marc H."]),
+      new Set(["Torsten K.", "Dieter A."]),
+      new Set(["Andreas B.", "Günter B."]),
+      new Set(["Michael H.", "Karin M."]),
+      new Set(["Jörg W.", "Ralf D."]),
+      new Set(["Andreas H.", "Michael d."])
+    ]);
+    
+    // Function to generate round 3 pairs
+    function generateRound3Pairs(persons, usedPairs) {
+      let result = null;
+      
+      // Convert usedPairs to an array of sorted strings for easy comparison
+      let usedPairsArray = Array.from(usedPairs).map(pair => Array.from(pair).sort().join(':'));
+      
+      while (result === null) {
+        let pairs = new Set();
+        let remainingPersons = new Set(persons);
+        while (remainingPersons.size >= 2) {
+          let [lhsPartner, rhsPartner] = getRandomPair(Array.from(remainingPersons));
+          let pairString = [lhsPartner, rhsPartner].sort().join(':');
+          
+          if (lhsPartner !== rhsPartner && !usedPairsArray.includes(pairString)) {
+            pairs.add(new Set([lhsPartner, rhsPartner]));
+            remainingPersons.delete(lhsPartner);
+            remainingPersons.delete(rhsPartner);
+          } else if (remainingPersons.size === 2) {
+            // If only two people are left and they have already been paired, break the loop
+            break;
+          }
+        }
+        
+        // If pairs were successfully created for all persons, set result to pairs
+        if (remainingPersons.size === 0) {
+          result = pairs;
+        }
+      }
+      
+      return result || new Set();
+    }
+    
+    function getRandomPair(personsArray) {
+      let idx1 = Math.floor(Math.random() * personsArray.length);
+      let idx2 = idx1;
+      while (idx2 === idx1) {
+        idx2 = Math.floor(Math.random() * personsArray.length);
+      }
+      return [personsArray[idx1], personsArray[idx2]];
+    }
+    
+    // Function to display pairs in the UI
+    function displayPairs(pairs, containerId, headline) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      const h2Element = document.createElement('h2')
+      h2Element.textContent = headline
+      container.appendChild(h2Element)
+      pairs.forEach(pair => {
+        const pairElement = document.createElement('div');
+        pairElement.className = "container d-flex flex-column justify-content-center align-items-center"
+        pairElement.textContent = Array.from(pair).join(' und ');
+        container.appendChild(pairElement);
+      });
+    }
+    
+    function display(persons, containerId, headline) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      const h2Element = document.createElement('h2')
+      h2Element.textContent = headline
+      container.appendChild(h2Element)
+      persons.forEach(person => {
+        const pairElement = document.createElement('div');
+        pairElement.className = "container d-flex flex-row justify-content-center align-items-center"
+        pairElement.textContent = person
+        container.appendChild(pairElement);
+      });
+    }
+    
+    // Initial display of round 1 and round 2 pairs
+    displayPairs(round1Pairs, 'round1Pairs', 'Paare (Runde 1):');
+    displayPairs(round2Pairs, 'round2Pairs', 'Paare (Runde 2):');
+    
+    // Event listener for the "Generate Round 3 Pairs" button
+    function generate() {
+      const usedPairs = new Set([...round1Pairs, ...round2Pairs])
+      const round3Pairs = generateRound3Pairs(persons, usedPairs);
+      displayPairs(round3Pairs, 'round3Pairs', 'Paare (Runde 3):');
+    }
+    
+    document.getElementById('generatePairs').addEventListener('click', generate);
+    
+    generate();
+  </script>
+</body>
+</html>
