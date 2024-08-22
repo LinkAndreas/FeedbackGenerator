@@ -24,6 +24,9 @@
     <div id="round3Pairs" class="mt-4">
       <!-- Round 3 Pairs will be generated and listed here -->
     </div>
+    <div id="round4Pairs" class="mt-4">
+      <!-- Round 4 Pairs will be generated and listed here -->
+    </div>
     <button id="generatePairs" class="btn btn-primary mt-4">Generiere Paare</button>
   </div>
 
@@ -62,9 +65,19 @@
       new Set(["Jörg W.", "Ralf D."]),
       new Set(["Andreas H.", "Michael d."])
     ]);
+
+    // Pairs from Round 3
+    let round3Pairs = new Set([
+      new Set(["Alisa C.", "Dieter A."]),
+      new Set(["Michael H.", "Michael d."]),
+      new Set(["Torsten K.", "Karin M."]),
+      new Set(["Andreas H.", "Ralf D."]),
+      new Set(["Marc H.", "Günter B."]),
+      new Set(["Jörg W.", "Andreas B."])
+    ]);
     
-    // Function to generate round 3 pairs
-    function generateRound3Pairs(persons, usedPairs) {
+    // Function to generate pairs
+    function generatePairs(persons, usedPairs) {
       let result = null;
       
       // Convert usedPairs to an array of sorted strings for easy comparison
@@ -134,15 +147,20 @@
       });
     }
     
-    // Initial display of round 1 and round 2 pairs
+    // Initial display of round 1, round 2 and round 3 pairs
     displayPairs(round1Pairs, 'round1Pairs', 'Paare (Runde 1):');
     displayPairs(round2Pairs, 'round2Pairs', 'Paare (Runde 2):');
-    
-    // Event listener for the "Generate Round 3 Pairs" button
+    displayPairs(round3Pairs, 'round3Pairs', 'Paare (Runde 3):');
+
+    // Event listener for the "Generate Round 4 Pairs" button
     function generate() {
-      const usedPairs = new Set([...round1Pairs, ...round2Pairs])
-      const round3Pairs = generateRound3Pairs(persons, usedPairs);
-      displayPairs(round3Pairs, 'round3Pairs', 'Paare (Runde 3):');
+      const usedPairs = new Set([
+        ...round1Pairs,
+        ...round2Pairs,
+        ...round3Pairs
+      ])
+      const round4Pairs = generatePairs(persons, usedPairs);
+      displayPairs(round4Pairs, 'round4Pairs', 'Paare (Runde 4):');
     }
     
     document.getElementById('generatePairs').addEventListener('click', generate);
